@@ -15,7 +15,6 @@ def get_viewstate(req):
 opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookielib.CookieJar()))
 urllib2.install_opener(opener)
 
-#cookie = "ASP.NET_SessionId=yntax145x2gfgkytzhx4vw45"
 username = raw_input('学号:')
 password = raw_input('密码:')
 log_url = 'http://202.120.108.62/ecustedu/StudentLogin.aspx'
@@ -23,7 +22,6 @@ req = urllib2.Request(log_url)
 log_viewstate = get_viewstate(req)
 
 postdata = urllib.urlencode({'__VIEWSTATE': log_viewstate, 'TxtStudentId': username, 'TxtPassword': password, 'BtnLogin': '登录'})
-
 login_response = urllib2.urlopen(req, postdata)
 
 def print_table(stream):
@@ -38,9 +36,7 @@ def print_table(stream):
         print ''
 
 url_now = 'http://202.120.108.62/ecustedu/E_SelectCourse/ScInFormation/syllabus.aspx'
-
 req = urllib2.Request(url_now)
-#req.add_header('Cookie', cookie)
 viewstate = get_viewstate(req)
 
 post_now = urllib.urlencode({"__VIEWSTATE": viewstate, "selyeartermflag": "这学期", "bttn_search": "查询"})
