@@ -4,6 +4,7 @@
 import subprocess
 import urllib2, urllib, json
 import tempfile
+import mplayer
 
 
 #api_string = 'http://www.douban.com/j/app/radio/people?app_name=radio_desktop_win&version=100&user_id=&expire=&token=&sid=&h=&channel=1&type=n'
@@ -15,7 +16,7 @@ expire = ''
 token = ''
 sid = ''
 h = ''
-channel = '1'
+channel = '7'
 Type = 'n'
 
 fm_url = 'http://www.douban.com/j/app/radio/people?'
@@ -33,6 +34,8 @@ final_url = fm_url + get_string
 
 img_file = tempfile.NamedTemporaryFile()
 
+p = mplayer.Player()
+
 while True:
     resp = urllib2.urlopen(final_url)
     play_list = json.loads(resp.read())['song']
@@ -42,4 +45,4 @@ while True:
         mp3_title = mp3['title'].encode('utf-8')
         mp3_info = (mp3['albumtitle'] + '\n' + mp3['artist'])
         subprocess.call(['notify-send', '-i', img_file.name, mp3_title, mp3_info])
-        subprocess.call(['mplayer', mp3['url']])
+        p.loadfile(mp3['url'])
