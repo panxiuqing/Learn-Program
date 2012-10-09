@@ -3,10 +3,11 @@
 
 struct pt_struct
 {
-  int clientfd;
-  char wbuf[MAXLINE];
-  char rbuf[MAXLINE];
+  int clientfd; //客户端文件描述符
+  char wbuf[MAXLINE]; //发送消息缓冲区
+  char rbuf[MAXLINE]; //接受消息缓冲区
   rio_t rio;
+  char name_list[128][20];
 };
 
 struct win_struct
@@ -25,7 +26,6 @@ int main(int argc, char *argv[])
 {
   WINDOW *send_win, *people_win;
   win_s send, people;
-  //  int startx, starty, width, height;
   int ch;
 
   int port, i = 0;
@@ -41,7 +41,8 @@ int main(int argc, char *argv[])
   for (i = 0; i < strlen(argv[3]); i++) {
       pt.wbuf[i] = argv[3][i];
   }
-  pt.wbuf[i] = ':';
+
+  fprintf(stdout, "OK in 46\n");
 
   // setlocale(LC_ALL, "zh_CN.UTF-8");
   initscr();
@@ -57,33 +58,25 @@ int main(int argc, char *argv[])
   start_color();
   init_pair(1, COLOR_GREEN, COLOR_BLACK);
   init_pair(2, COLOR_YELLOW, COLOR_BLACK);
+  init_pair(3, COLOR_BLUE, COLOR_BLACK);
+  init_pair(4, COLOR_CYAN, COLOR_BLACK);
 
   send.height = 5;
-  people.height = LINES;
-
   send.width = COLS - 20;
-  people.width = 20;
-
   send.startx = 0;
-  people.startx = COLS - 20;
-
-  people.starty = 0;
   send.starty = LINES - 5;
 
   refresh();
   
   send_win = create_newwin(send, "SEND");
-  people_win = create_newwin(people, "PEOPLE:");
-  
-  /* attron(COLOR_PAIR(2));
-  mvprintw(send.starty, send.startx, "%s", "SEND");
-  attroff(COLOR_PAIR(2));
 
-  mvprintw(people.starty + 1, people.startx + 1, "%s", "PEOPLE: ");
-  */
   refresh();
   pt.clientfd = open_clientfd(host, port);
   Rio_readinitb(&(pt.rio), pt.clientfd);
+  pt.wbuf[strlen(argv[3])] = '\n';
+  Rio_writen(pt.clientfd, pt.wbuf, strlen(pt.wbuf));
+  pt.wbuf[strlen(argv[3])] = ':';
+  
   pthread_create(&read_pid, NULL, read_thread, &pt);
 
   int name_len = strlen(argv[3]) + 1;
@@ -92,12 +85,8 @@ int main(int argc, char *argv[])
     Rio_writen(pt.clientfd, pt.wbuf, strlen(pt.wbuf));
     bzero(pt.wbuf + name_len, MAXLINE - name_len);
     werase(send_win);
-    //box(send_win, 0, 0);
-    //mvwprintw(send_win, 0, 0, "%s", "SEND");
   }
 
-  /*while((ch = getch()) != KEY_F(2)) {
-    }*/
   endwin();
   return 0;
 }
@@ -106,11 +95,11 @@ WINDOW *create_newwin(win_s w, char *t)
 {
   WINDOW *local_win, *border_win;
   border_win = newwin(w.height, w.width, w.starty, w.startx);
-  local_win = newwin(w.height - 2, w.width - 2, w.starty + 1, w.startx + 1);
+  local_win = newwin(w.height - 2, w.width - 2, w.starty + 1, w.startx + 1); 
   box(border_win, 0, 0);
-  attron(A_BOLD);
+  wattron(border_win, A_BOLD);
   mvwprintw(border_win, 0, 0, "%s", t);
-  attroff(A_BOLD);
+  wattroff(border_win, A_BOLD);
   wrefresh(border_win);
   return local_win;
 }
@@ -124,25 +113,59 @@ void destroy_win(WINDOW *local_win)
 
 void read_thread(pt_s *pt)
 {
-  WINDOW *show_win;
-  win_s show;
-  int l = -1, y, x;
+  WINDOW *show_win, *people_win;
+  win_s show, people;
+  int l = -1, y, x, mes_len = 0;
+  int i = 0;
+  for (i = 0; i < 128; ++i) {
+    int j = 0;
+    for (j = 0; j < 20; ++j) {
+      pt->name_list[i][j] = 0;
+    }
+  }
+  people.startx = COLS - 20;
+  people.starty = 0;
+  people.width = 20;
+  people.height = LINES;
+  people_win = create_newwin(people, "PEOPLE");
 
   show.startx = show.starty = 0;
   show.height = LINES - 5;
   show.width = COLS - 20;
   show_win = create_newwin(show, "MESSAGE");
-  //  attron(COLOR_PAIR(1));
-  //mvwprintw(show_win, show.starty, show.startx, "%s", "MESSAGE");
-  //attroff(COLOR_PAIR(1));
-  //wrefresh(show_win);
-  //scroll
   scrollok(show_win, true);
   wsetscrreg(show_win, 0, show.height - 3);
   while (Rio_readlineb(&(pt->rio), pt->rbuf, MAXLINE)) {
-    if (l < show.height - 3)
-      l++;
-    mvwprintw(show_win, l, 0, "%s", pt->rbuf);
-    wrefresh(show_win);
+    int color_num = pt->rbuf[0] % 5;
+    mes_len = strlen(pt->rbuf);
+    if (pt->rbuf[mes_len - 2] == '#') { // 显示消息
+      pt->rbuf[mes_len - 2] = '\n';
+      pt->rbuf[mes_len - 1] = '\0';
+      if (l < show.height - 3)
+	l++;
+      wattron(show_win, COLOR_PAIR(color_num));
+      mvwprintw(show_win, l, 0, "%s", pt->rbuf);
+      wattroff(show_win, COLOR_PAIR(color_num));
+      wrefresh(show_win);
+    }
+    else { // 打印在线列表
+      char pos = pt->rbuf[mes_len - 2];
+      if (pt->name_list[pos][0]) {
+	pt->name_list[pos][0] = 0;
+      }
+      else {
+	strncpy(pt->name_list[pos], pt->rbuf, mes_len - 2);
+      }
+      int i = 0, ll = 0;
+      werase(people_win);
+      for (i = 0; i < 128; ++i) {
+	if (pt->name_list[i][0]) {
+	  wattron(people_win, COLOR_PAIR(pt->name_list[i][0] % 5));
+	  mvwprintw(people_win, ll++, 0, "%s", pt->name_list[i]);
+	  wattroff(people_win, COLOR_PAIR(pt->name_list[i][0] % 5));
+	  wrefresh(people_win);
+	}
+      }
+    }
   }
 }
