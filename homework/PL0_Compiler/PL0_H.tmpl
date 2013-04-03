@@ -1,0 +1,37 @@
+#ifndef $header.name
+#define $header.name
+
+/* Macro definition */
+#for $macro in $macros:
+#define $macro.name $macro.value
+#end for
+
+/* enum definition */
+#for $enum in $enums:
+enum $enum.name {
+#for $enum_value in $enum.values:
+     $enum_value,
+#end for
+};
+#end for
+
+/* struct definition */
+#for $struct in $structs:
+typedef struct {
+#for $item in $struct.items:
+     $item.type $item.name;
+#end for
+} $struct.name;
+#end for
+
+/* global variable definition */
+#for $variable in $variables:
+$variable.type $variable.name;
+#end for
+
+/* function definition */
+#for $function in $functions:
+$function.return_type $function.name;
+#end for
+
+#endif

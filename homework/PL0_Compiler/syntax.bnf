@@ -1,0 +1,66 @@
+A:      const        B
+                     C
+B:      ident        D
+C:      var          E
+                     F
+D:      =            G
+E:      ident        H
+F:      procedure    I
+                     J
+G:      number       K
+H:      ,            E
+        ;            F
+I:      ident        L
+J:      ident        M
+        call         N
+        begin        O
+        if           P
+        while        Q
+        read         R
+        write        S
+                                //
+K:      ,            B
+        ;            C
+L:      ;            T
+M:      :=           U
+N:      ident                   //
+O:      A            V
+P:      W            X
+Q:      W            Y
+R:      (            Z
+S:      (            AA
+T:      A            BB
+U:      +            CC
+        -            CC
+                     CC
+V:      ;            O
+        end                     //
+W:      odd          U
+        U            DD
+X:      then         A
+Y:      do           A
+Z:      ident        EE
+AA:     U            FF
+BB:     ;            F
+CC:     GG           HH
+DD:     ==           U
+        #            U
+        <            U
+        <=           U
+        >            U
+        >=           U
+EE:     )                       //
+        ,            Z
+FF:     )                       //
+        ,            AA
+GG:     II           JJ
+HH:                  U
+                                //
+II:     ident                   //
+        number                  //
+        (            KK
+JJ:     *            GG
+        /            GG
+                                //
+KK:     U            LL
+LL:     )                       //

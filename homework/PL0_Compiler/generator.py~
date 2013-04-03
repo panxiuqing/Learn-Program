@@ -1,0 +1,34 @@
+# from Cheetah.Template import Template
+from PL0_H import PL0_H
+
+
+header = {"name": "PLO_H",
+          "file_name": "plo.h"}
+
+macros = [{"name": "NUM_MAX", "value": 10}]
+
+enums = [{'name': 'symbol',
+          'values': ['BEGIN', 'END', 'CALL']}]
+
+structs = [{'name': 'word_etype_t',
+            'items': [{'type': 'char', 'name': 'szWord[10]'},
+                      {'type': 'enum symbol', 'name': 'eType'}]}]
+
+variables = [{'type': 'FILE *', 'name': 'fPointer'}]
+
+functions = [{'return_type': 'int', 'name': 'print_source_file()'}]
+
+def header_file():
+    
+    print PL0_H(searchList=[{'header': header,
+                             'macros': macros,
+                             'enums': enums,
+                             'structs': structs,
+                             'variables': variables,
+                             'functions': functions}])
+
+def lexical():
+    DFA_struct = {'S': [(['[a-zA-Z]'], 'B'), (['+', '-', '*', '/', ';')]
+
+if __name__ == "__main__":
+    header_file()

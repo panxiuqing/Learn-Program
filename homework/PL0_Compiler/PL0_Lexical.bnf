@@ -1,0 +1,32 @@
+{
+S: [a-z, A-Z] A
+   [0-9] B
+   [':'] C
+   ['=', '<', '>'] D
+   ['+', '-', '*', '/', ';', ',', '.', '#', '(', ')'] Z
+A: [a-z, A-Z, 0-9, _] Z
+B: [0-9] B
+   [] Z
+   [.] E
+C: [=] Z
+D: [=] Z
+   [] Z
+E: [0-9] E
+   [] Z
+}
+
+#define one enum type to one unterminal symbol
+
+A:      [a-z|A-Z]                       B       getc()
+                                        C       ![a-z|A-Z]
+B:      [a-z|A-Z|0-9|_]                 B       getc()
+                                        C       ![a-z|A-Z|0-9|_]
+C:      [:]                             D       getc()
+                                        E       ![a-z|A-Z|0-9|_|:]
+D:      [=]                             A       getc()
+                                        ERR
+E:      [=|<|>]                         F       getc()
+                                        G
+F:      [=]                             A       getc()
+                                        A
+G:      [+|-|*|/|;|.|,|#|(|)]           A

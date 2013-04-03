@@ -1,0 +1,53 @@
+
+
+int main(int argc, char **argv)
+{
+    char filename[256];
+    FILE *$vars.fP;
+    $funs.init;
+    if (argc == 2) {
+        strcpy(filename, argv[1]);
+    }
+    else {
+        strcpy(filename, "$macros.compiled_file"); 
+    }
+    fopen($vars.fP, "r");
+#if $funs.print_source:
+    $funs.print_source;
+    f.seek($vars.fP, 0, SEEK_SET);
+#end if
+    
+    /* Lexical Analysis */
+    $funs.lexical
+
+    return 0;
+}
+
+#if $funs.print_source:
+int $funs.print_source
+{
+    char c;
+    while((c = fgetc(fPointer)) != EOF) {
+         putc(c, stdout);
+    }
+}
+#end if
+
+int $funs.init
+{
+    int i = 0;
+    
+    /* Initial enum */
+    #while $struct_dict:
+    #set $enum_type, $enum_item = $struct_dict.popitem()
+    for (i = 0; i < 256; i++) {
+        $emap($enum_type)[i] = UNDEFINED
+    }
+    #while $enum_item:
+    #set $key, $value = $enum_item.popitem()
+    #for $c in $key:
+    $emap($enum_type)['$c'] = $value
+    #end for
+    #end while
+    #end while
+}

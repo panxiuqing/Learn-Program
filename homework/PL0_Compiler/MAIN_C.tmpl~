@@ -1,0 +1,50 @@
+#for $head_file in $head_files:
+#include "$head_file"
+#end for
+
+int main(int argc, char **argv)
+{
+    char filename[256];
+    FILE *$vars.fP;
+    $funs.init;
+    if (argc == 2) {
+        strcpy(filename, argv[1]);
+    }
+    else {
+        strcpy(filename, $compiled_file); 
+    }
+    fopen($vars.fP, "r");
+#if $funs.print_source:
+    $funs.print_source;
+    f.seek($vars.fP, 0, SEEK_SET);
+#end if
+    
+    /* Lexical Analysis */
+    $funs.lexical
+
+    return 0;
+}
+
+#if $funs.print_source:
+int $funs.print_source
+{
+    char c;
+    while((c = fgetc(fPointer)) != EOF) {
+         putc(c, stdout);
+    }
+}
+#end if
+
+int $funs.init
+{
+    int i = 0;
+    for (i = 0; i < 256; i++) {
+        $vars.sSym[i] = $enms.nul
+    }
+    
+#for $s in $enms.singleList:
+    $genSingleSym($s.name) = $s.type;
+#end for
+
+#for $rmWord in $
+}

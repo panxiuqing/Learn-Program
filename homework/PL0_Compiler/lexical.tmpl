@@ -1,0 +1,23 @@
+
+
+int lexical_analysis()
+{
+    cNow = fgetc($vars.fP);
+    while($emap("A")[cNow] != ENDOFFILE) {
+        if ($emap("A")[cNow] == A) {
+            cNow = fgetc($vars.fP);
+            continue;
+        }
+        nWordIndex = 0;
+
+        #set $sa = $struct_dict.A
+        #while $sa:
+        #set $key, $val = $sa.popitem
+        if ($emap("A")[cNow] == B) {
+            do {
+                szWord[nWordIndex++] = cNow;
+                cNow = fgetc($vars.fP);
+            } while($emap("B")[cNow] == B)
+        }
+    }
+}
