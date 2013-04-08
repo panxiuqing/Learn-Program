@@ -1,4 +1,4 @@
-const c1=2.2, c2=10;
+const c1=2, c2=10;
 var num1, count, sum;
 
 begin

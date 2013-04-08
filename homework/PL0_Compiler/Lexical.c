@@ -5,20 +5,22 @@
 
 int print_lexical_table()
 {
-    printf("--------------------begin---------------------\n");
+    printf("\n--------------------begin lexical analysis---------------------\n");
     int i = 0;
     for (i = 0; i < nAllIndex; i++) {
-        if (allWords[i].eType == INTEGER) {
-          printf("%-6d%-15s%-15s%d\n", i, allWords[i].szWord, "INTEGER", (int)allWords[i].value);
-        }
-        else if (allWords[i].eType == FLOATNUM) {
-          printf("%-6d%-15s%-15s%f\n", i, allWords[i].szWord, "FLOAT", allWords[i].value);
-        }
-        else {
-            printf("%-6d%-15s%-15s\n", i, allWords[i].szWord, symStringMap[allWords[i].eType]);
-        }
+      printf ("%-6d%-15s%-15s", i, allWords[i].szWord, symStringMap[allWords[i].eType]);
+      switch(allWords[i].eType) {
+      case INTEGER: printf ("%d\n", (int)allWords[i].value);
+        break;
+      case FLOATNUM: printf ("%f\n", allWords[i].value);
+        break;
+      case UNDEFINED: printf ("\t!!! ERROR\n");
+        break;
+      default: printf ("\n");
+        break;
+      }
     }
-    printf("--------------------end------------------------\n");
+    printf("\n--------------------end lexical analysis------------------------\n");
 }
 
 /* if word in remainwords set to remainword type, else set to identify */
@@ -33,12 +35,12 @@ enum symbol getWordType(char *szWord)
     return IDENTIFY;
 }
 
-int error(enum symbol s)
+int error(enum errors e)
 {
-  switch(s) {
-  case UNDEFINED: printf("Get an undefined charactor\n");
-    break;
-  default: break;
+  switch(e) {
+    case OUT_OF_LEXICAL_LENGTH: printf("The Word too Length\n");
+      break;
+    default: break;
   }
   fclose(fPointer);
   exit(1);
@@ -46,47 +48,53 @@ int error(enum symbol s)
 
 int lexical_analysis()
 {
-    unsigned char cNow = ' ';
-    enum symbol etype = UNDEFINED;
-    int nWordIndex = 0, num = 0;
-    nAllIndex = 0;
+    unsigned char cNow = ' ';   /* The Char get from fPointer */
+    enum symbol etype = UNDEFINED; /* etype of current word */
+    int nWordIndex = 0;            /* index of the Char in current word */
+    nAllIndex = 0;                 /* index of current word in source file */
     cNow = fgetc(fPointer);
 
-    while (eTypeMap[cNow] != ENDOFFILE) {
-        if (eTypeMap[cNow] == SEPERATER) {
+    while (eTypeMap[cNow] != ENDOFFILE) { /* EOF */
+        if (eTypeMap[cNow] == SEPERATER) { /* '\n', '\t', ' ' */
             cNow = fgetc(fPointer);
             continue;
         }
         nWordIndex = 0;
 
-        if (eTypeMap[cNow] <= UPPERC) {
+        /* identify or remain word */
+        if (eTypeMap[cNow] <= UPPERC) { /* a-z or A-Z */
             do {
                 if (nWordIndex < MAX_LENGTH_LEXICAL) {
                     szWord[nWordIndex++] = cNow;
                 }
+                else {
+                  error(OUT_OF_LEXICAL_LENGTH);
+                }
                 cNow = fgetc(fPointer);
-            } while(eTypeMap[cNow] <= UNDERLINE);
+            } while(eTypeMap[cNow] <= UNDERLINE); /* a-z or A-Z or 0-9 or _ */
 
-            szWord[nWordIndex] = 0;     //end of string
-            strcpy(allWords[nAllIndex].szWord, szWord);  //copy to global table
-            allWords[nAllIndex++].eType = getWordType(szWord);     //assign etype to word
+            szWord[nWordIndex] = 0;     /* end of string */
+            strcpy(allWords[nAllIndex].szWord, szWord);  /* copy to global table */
+            allWords[nAllIndex++].eType = getWordType(szWord);     /* get etype of word */
             continue;
         }
 
+        /* integer or float */
         if (eTypeMap[cNow] == DIGITC) {
             int num = 0;
             float fnum = 0;
             int count = 1;
-            allWords[nAllIndex].eType = INTEGER;
+            int endp = 0;       /* period not followed by digit */
+            etype = INTEGER;
             do {
                 num = 10 * num + cNow - '0';
                 szWord[nWordIndex++] = cNow;
                 cNow = fgetc(fPointer);
-            } while(eTypeMap[cNow] == DIGITC);
-            if (eTypeMap[cNow] == PERIOD) {
+            } while(eTypeMap[cNow] == DIGITC); /* get number of integer */
+            if (eTypeMap[cNow] == PERIOD) {    /* followed by a period */
               cNow = fgetc(fPointer);
-              if (eTypeMap[cNow] == DIGITC) {
-                allWords[nAllIndex].eType = FLOATNUM;
+              if (eTypeMap[cNow] == DIGITC) { /* period followed by a digit means float */
+                etype = FLOATNUM; /* modify etype to FLOATNUM */
                 szWord[nWordIndex++] = '.';
                 fnum = num;
                 do {
@@ -96,45 +104,45 @@ int lexical_analysis()
                   cNow = fgetc(fPointer);
                 } while (eTypeMap[cNow] == DIGITC);
               }
-              else {
-                allWords[nAllIndex].eType = PERIOD;
-                strcpy(allWords[nAllIndex++].szWord, ".");
-                continue;
+              else {            /* period not followed by digit means end of program */
+                endp = 1;
               }
             }
             szWord[nWordIndex] = 0;
             strcpy(allWords[nAllIndex].szWord, szWord);
-
-            if (nWordIndex > MAX_NUM_BIT) {
-            }
+            allWords[nAllIndex].eType = etype;
             allWords[nAllIndex++].value = fnum ? fnum : num;
+            if (endp == 1) {
+              allWords[nAllIndex].eType = PERIOD;
+              strcpy(allWords[nAllIndex].szWord, ".");
+            }
             continue;
         }
 
-        if (eTypeMap[cNow] == COLON) {
+        if (eTypeMap[cNow] == COLON) { /* : */
             cNow = fgetc(fPointer);
-            if (eTypeMap[cNow] == CONSTDEF) {
+            if (eTypeMap[cNow] == CONSTDEF) { /* := */
                 strcpy(allWords[nAllIndex].szWord, ":=");
                 allWords[nAllIndex++].eType = BECOMES;
                 cNow = fgetc(fPointer);
             }
             else {
+                strcpy(allWords[nAllIndex].szWord, ":");
                 allWords[nAllIndex++].eType = UNDEFINED;
-                error(UNDEFINED);
             }
             continue;
         }
 
-        if (eTypeMap[cNow] == LSS || eTypeMap[cNow] == GRTR || eTypeMap[cNow] == CONSTDEF) {
+        if (eTypeMap[cNow] == LSS || eTypeMap[cNow] == GRTR || eTypeMap[cNow] == CONSTDEF) { /* <, >, = */
             szWord[nWordIndex++] = cNow;
             szWord[nWordIndex] = 0;
             etype = eTypeMap[cNow];
             cNow = fgetc(fPointer);
-            if (eTypeMap[cNow] == CONSTDEF) {
+            if (eTypeMap[cNow] == CONSTDEF) { /* <=, >=, == */
               szWord[nWordIndex++] = cNow;
               szWord[nWordIndex] = 0;
               etype += 1;
-                cNow = fgetc(fPointer);
+              cNow = fgetc(fPointer);
             }
             strcpy(allWords[nAllIndex].szWord, szWord);
             allWords[nAllIndex++].eType = etype;
@@ -144,7 +152,7 @@ int lexical_analysis()
         else {
             allWords[nAllIndex].szWord[0] = cNow;
             allWords[nAllIndex].szWord[1] = 0;
-            allWords[nAllIndex++].eType = eTypeMap[cNow];
+            allWords[nAllIndex++].eType = eTypeMap[cNow] == UNDERLINE ? UNDEFINED : eTypeMap[cNow];
             cNow = fgetc(fPointer);
             continue;
         }

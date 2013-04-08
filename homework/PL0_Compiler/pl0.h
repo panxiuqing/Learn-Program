@@ -8,10 +8,10 @@
 #define MAX_NUM_BIT 10      //max bit of number
 
 enum symbol {
-  LOWERC,                       /* [a-z] */
-  UPPERC,                       /* [A-Z] */
-  DIGITC,                       /* [0-9] */
-  UNDERLINE,                    /* [_] */
+    LOWERC,                       /* [a-z] */
+    UPPERC,                       /* [A-Z] */
+    DIGITC,                       /* [0-9] */
+    UNDERLINE,                    /* [_] */
     BEGINSYM,   //begin
     CALLSYM,    //call
     CONSTSYM,   //const
@@ -27,12 +27,12 @@ enum symbol {
     WRITESYM,   //write
     IDENTIFY,   //like sDA3F
     INTEGER,     //like 2362
-  FLOATNUM,      /* like 12.42 */
+    FLOATNUM,      /* like 12.42 */
     PLUS,       //+
     MINUS,      //-
     TIMES,      //*
     SLASH,      ///
-  CONSTDEF,     /* = */
+    CONSTDEF,     /* = */
     EQL,        //==
     NEQL,       //#
     LSS,        //<
@@ -45,10 +45,14 @@ enum symbol {
     SEMICOLON,  //;
     PERIOD,     //.
     BECOMES,    //:=
-  COLON,        /* : */
-  SEPERATER,    /* ' ', '\t', '\n' */
-  UNDEFINED,          /* undefined char */
-  ENDOFFILE,    /* end of file */
+    COLON,        /* : */
+    SEPERATER,    /* ' ', '\t', '\n' */
+    UNDEFINED,          /* undefined char */
+    ENDOFFILE,    /* end of file */
+};
+
+enum errors {
+  OUT_OF_LEXICAL_LENGTH,
 };
 
 enum object {
@@ -66,7 +70,6 @@ typedef struct {
 FILE *fPointer;
 
 char szWord[MAX_LENGTH_LEXICAL];
-/* enum symbol etype; */
 int nAllIndex;
 word_etype_t allWords[MAX_WORDS];
 word_etype_t remainWordMap[NUM_REMAIN_WORDS];
@@ -79,6 +82,6 @@ int init();
 int lexical_analysis();
 int print_lexical_table();
 enum symbol getWordType(char *);
-int error(enum symbol);
+int error(enum errors);
 
 #endif // PL0_H
