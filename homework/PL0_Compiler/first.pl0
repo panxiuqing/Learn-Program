@@ -1,5 +1,19 @@
-const c1=2, c2=10;
-var num1, count, sum;
+const a1=2, a2=10;
+var z1, z2, z3;
+
+procedure deep0;
+  const x1=2.3, x2=19;
+  procedure deep1;
+    var y1, y2;
+    if odd a1 then
+      read (y1, z1);
+  begin
+    call deep1;
+    write (x1 * x2 + z1);
+  end;
+
+procedure sec;
+  call deep0;
 
 begin
   num1:=c1;
@@ -13,5 +27,5 @@ begin
       sum:=sum+count;
       count:=count+1;
     end;
-end;.
+end.
     

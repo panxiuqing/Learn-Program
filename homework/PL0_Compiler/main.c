@@ -15,6 +15,8 @@ int main()
     printf("Begin lexical analysis\n");
     lexical_analysis();
     fclose(fPointer);
+
+    //    parsing_analysis(0);
     /*
 
     */
