@@ -65,6 +65,8 @@ int init()
     eTypeMap[';'] = SEMICOLON;
     eTypeMap['.'] = PERIOD;
     eTypeMap['='] = CONSTDEF;
+    eTypeMap['{'] = BEGINSYM;
+    eTypeMap['}'] = ENDSYM;
     /* End eTypeMap initial */
 
     /* Initial remainWordMap for match remainWord */
@@ -81,6 +83,7 @@ int init()
     strcpy(remainWordMap[10].szWord, "var");
     strcpy(remainWordMap[11].szWord, "while");
     strcpy(remainWordMap[12].szWord, "write");
+    strcpy(remainWordMap[13].szWord, "else");
 
     remainWordMap[0].eType = BEGINSYM;
     remainWordMap[1].eType = CALLSYM;
@@ -95,6 +98,7 @@ int init()
     remainWordMap[10].eType = VARSYM;
     remainWordMap[11].eType = WHILESYM;
     remainWordMap[12].eType = WRITESYM;
+    remainWordMap[13].eType = ELSESYM;
     /* End Initial remainWord */
 
     /* Initial symStringMap for Print eType */
@@ -132,6 +136,7 @@ int init()
     strcpy(symStringMap[PERIOD], "PERIOD");
     strcpy(symStringMap[BECOMES], "BECOMES");
     strcpy(symStringMap[CONSTDEF], "CONSTDEF");
+    strcpy(symStringMap[ELSESYM], "ELSE");
     /* End Initial symStringMap */
 
     return 0;

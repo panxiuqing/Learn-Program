@@ -1,10 +1,10 @@
 #ifndef PL0_H
 #define PL0_H
 
-#define NUM_REMAIN_WORDS 13  //number of remained words
+#define NUM_REMAIN_WORDS 14  //number of remained words
 #define MAX_LENGTH_LEXICAL  10 //max length of lexical
-#define NUM_SYMBOL  41
-#define NUM_ERROR 13
+#define NUM_SYMBOL  42
+#define NUM_ERROR 14
 #define MAX_WORDS 1000      //max words to store
 #define MAX_NUM_BIT 10      //max bit of number
 
@@ -37,6 +37,7 @@ enum symbol {
     DOSYM,      //do
     ENDSYM,     //end
     IFSYM,      //if
+    ELSESYM,    //else
     ODDSYM,     //odd
     PROCSYM,    //procedure
     READSYM,    //read
@@ -83,6 +84,7 @@ enum parsError {
     NEED_COMPARE,
     NEED_CONSTDEF,
     NEED_IDENTIFY,
+    NEED_ELSE,
     NOT_FACTOR,
 };
 

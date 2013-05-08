@@ -170,6 +170,12 @@ int statementParsing(int nLayer)
             if (allWords[nAllIndex].eType == BECOMES) {
                 PARSING_PRINT("BECOMES");
                 expressionParsing(nLayer+1);
+                if (allWords[nAllIndex].eType == SEMICOLON) {
+                    PARSING_PRINT("SEMICOLON");
+                }
+                else {
+                    parsing_error(NEED_SEMICOLON);
+                }
             }
             else {
                 parsing_error(NEED_BECOMES);
@@ -203,13 +209,23 @@ int statementParsing(int nLayer)
         case IFSYM:
             parsingPrintLn(nLayer-1, "IF_STATEMENT", 0);
             PARSING_PRINT("IF");
-            conditionParsing(nLayer+1);
-            if (allWords[nAllIndex].eType == THENSYM) {
-                PARSING_PRINT("THEN");
-                statementParsing(nLayer+1);
+            if (allWords[nAllIndex].eType == LPAREN) {
+                PARSING_PRINT("LEFT_PAREN");
+                conditionParsing(nLayer+1);
+                if (allWords[nAllIndex].eType == RPAREN) {
+                    PARSING_PRINT("RIGHT_PAREN");
+                    statementParsing(nLayer+1);
+                    if (allWords[nAllIndex].eType == ELSESYM) {
+                        PARSING_PRINT("ELSE");
+                        statementParsing(nLayer+1);
+                    }
+                }
+                else {
+                    parsing_error(NEED_RPAREN);
+                }
             }
             else {
-                parsing_error(NEED_THEN);
+                parsing_error(NEED_LPAREN);
             }
             break;
         case WHILESYM:
