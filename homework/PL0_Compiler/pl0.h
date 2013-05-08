@@ -20,6 +20,10 @@
     allWords[nAllIndex].pos_in_line = pos_in_line - nWordIndex; \
     nAllIndex++
 
+#define PARSING_PRINT(_content) \
+    parsingPrintLn(nLayer, _content, 1); \
+    nAllIndex += 1
+
 #define ETYPE_IN_COMPARE(e) e == EQL || e == NEQL || e == LSS || e == LSSEQL || e == GRTR || e == GRTREQL 
 
 enum symbol {

@@ -16,7 +16,7 @@ int main()
     lexical_analysis();
     fclose(fPointer);
 
-    //    parsing_analysis(0);
+    parsing_analysis(0);
     /*
 
     */
